@@ -98,7 +98,7 @@ pefile==2019.4.18
 persistent==4.5.0
 pexpect==4.2.1
 pickleshare==0.7.4
-Pillow==5.1.0
+Pillow==6.2.0
 pluggy==0.13.0
 progressbar2==3.36.0
 prompt-toolkit==1.0.15
