@@ -14,7 +14,7 @@ class MainWindow(QtWidgets.QWidget):
 
         layout = QtWidgets.QVBoxLayout()
         file_layout = QtWidgets.QHBoxLayout()
-        self.setWindowTitle("Imágenes para pecas")
+        self.setWindowTitle("CSV Chart Creator")
         self.setFixedHeight(400)
         self.setFixedWidth(600)
 
@@ -33,7 +33,7 @@ class MainWindow(QtWidgets.QWidget):
         directory_layout = QtWidgets.QHBoxLayout()
         self.chooseDirectory = QtWidgets.QPushButton(parent=self)
         self.chooseDirectory.setText("¿Dónde guardar?")
-        self.chooseDirectory.clicked.connect(self.select_directory)
+        self.chooseDirectory.clicked.connect(self.select_directory)Imágenes para pecas
 
         self.directory_label = QtWidgets.QLabel("No se seleccionó ningún directorio")
         directory_layout.addWidget(self.chooseDirectory)
