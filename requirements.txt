@@ -23,7 +23,7 @@ Click==7.0
 colorama==0.4.1
 configparser==4.0.2
 contextlib2==0.6.0.post1
-cryptography==2.1.4
+cryptography==2.3
 cycler==0.10.0
 DateTime==4.3
 datetime-distance==0.1.3
