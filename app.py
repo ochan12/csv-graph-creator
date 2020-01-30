@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt# Pie chart
 from matplotlib import font_manager as fm
 import matplotlib as mpl
-import csv, pandas as pd
+import csv, pandas as pd, numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 print(fm._fmcache)
 
@@ -33,7 +33,7 @@ class MainWindow(QtWidgets.QWidget):
         directory_layout = QtWidgets.QHBoxLayout()
         self.chooseDirectory = QtWidgets.QPushButton(parent=self)
         self.chooseDirectory.setText("¿Dónde guardar?")
-        self.chooseDirectory.clicked.connect(self.select_directory)Imágenes para pecas
+        self.chooseDirectory.clicked.connect(self.select_directory)
 
         self.directory_label = QtWidgets.QLabel("No se seleccionó ningún directorio")
         directory_layout.addWidget(self.chooseDirectory)
@@ -46,6 +46,7 @@ class MainWindow(QtWidgets.QWidget):
 
         self.create_radio_options()
         
+        self.create_graph_type_combo()
 
         self.finalGroupButton = QtWidgets.QButtonGroup(self)
         self.processFilesButton = QtWidgets.QPushButton(self)
@@ -56,9 +57,21 @@ class MainWindow(QtWidgets.QWidget):
         
         layout.addLayout(file_layout)
         layout.addLayout(self.radio_options_layout)
+        layout.addLayout(self.graph_type_layout)
         layout.addLayout(directory_layout)
+
         layout.addWidget(self.processFilesButton)
         self.setLayout(layout)
+
+    def create_graph_type_combo(self):
+
+        self.graph_type_layout = QtWidgets.QHBoxLayout()
+        self.graph_type_combo = QtWidgets.QComboBox()
+        self.graph_type_combo.addItems(["Torta", "Barras", "Histograma"])
+        
+        self.graph_type_layout.addWidget(QtWidgets.QLabel("Tipo de gráfico: "))
+        self.graph_type_layout.addWidget(self.graph_type_combo)
+        self.graph_type_layout.addStretch()
 
     def create_radio_options(self):
         self.radio_options_layout = QtWidgets.QHBoxLayout()
@@ -114,9 +127,20 @@ class MainWindow(QtWidgets.QWidget):
         for autotext in autotexts:
             autotext.set_color('grey')
         ax1.axis('equal')  
-        plt.tight_layout()
-        
+        plt.tight_layout()        
         plt.savefig(self.directory+'/'+file.replace('.csv', '')+'_pie.eps')
+
+    def create_bar_chart(self, sizes, colors, labels, file):
+        print("Creating bar chart")
+        fig, ax = plt.subplots()
+        index = np.arange(len(labels))
+        bar_width = 0.35
+        opacity = 0.8
+        plt.bar(index, sizes, bar_width, alpha=opacity,color=colors)
+        plt.xticks(index, labels)
+        plt.tight_layout()        
+        plt.savefig(self.directory+'/'+file.replace('.csv', '')+'_bar.eps')
+        print("Finished bar chart")
 
     def create_images(self):
         if len(self.directory) != 0:
@@ -128,21 +152,24 @@ class MainWindow(QtWidgets.QWidget):
                     i = 1
                     for row in open_file:
                         sizes = [v for k, v in row.items()]
-                        self.create_pie_chart(sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_'+str(i))
+                        if self.graph_type_combo.currentIndex() == 0:
+                            self.create_pie_chart(sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_'+str(i))
+                        elif self.graph_type_combo.currentIndex() == 1:
+                            self.create_bar_chart(sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_'+str(i))
                         i+=1
                 else:
                     df = pd.read_csv(file[1])
                     sizes = [df[column].sum() for column in df.columns]
-                    self.create_pie_chart(sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_groupped')              
+                    if self.graph_type_combo.currentIndex() == 0:
+                        self.create_pie_chart(sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_groupped')
+                    elif self.graph_type_combo.currentIndex() == 1:
+                        self.create_bar_chart(sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_groupped')             
         else:
             self.showDialog()
 
     def item_changed(self, item):
         if item.column() > 0:
-            print("Item changed")
             hexa = item.text()
-            print("Hexa")
-            print(hexa)
             item_changed = False
             if len(hexa) == 0:
                 hexa = "#FFFFFF"
@@ -200,7 +227,7 @@ class MainWindow(QtWidgets.QWidget):
             csv_file = csv.DictReader(open(file[1]))
             for field in csv_file.fieldnames:
                 if not self.column_colors.__contains__(field):
-                    self.column_colors[field] = "#000555"
+                    self.column_colors[field] = "#CCC000"
         
         self.colorTable.setRowCount(len(self.column_colors.keys()))
         i=0
