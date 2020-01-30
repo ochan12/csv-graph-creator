@@ -50,6 +50,8 @@ class MainWindow(QtWidgets.QWidget):
 
         self.create_radio_options()
 
+        self.create_label_color()
+
         self.create_graph_type_combo()
 
         self.finalGroupButton = QtWidgets.QButtonGroup(self)
@@ -61,6 +63,7 @@ class MainWindow(QtWidgets.QWidget):
         layout.addLayout(file_layout)
         layout.addLayout(self.radio_options_layout)
         layout.addLayout(self.graph_type_layout)
+        layout.addLayout(self.color_label_layout)
         layout.addLayout(directory_layout)
 
         layout.addWidget(self.processFilesButton)
@@ -75,6 +78,12 @@ class MainWindow(QtWidgets.QWidget):
         self.graph_type_layout.addWidget(QtWidgets.QLabel("Tipo de gráfico: "))
         self.graph_type_layout.addWidget(self.graph_type_combo)
         self.graph_type_layout.addStretch()
+
+    def create_label_color(self):
+        self.color_label_layout = QtWidgets.QHBoxLayout()
+        self.color_label_layout.addWidget(QtWidgets.QLabel("Color de texto"))
+        self.label_color_field = QtWidgets.QLineEdit()
+        self.color_label_layout.addWidget(self.label_color_field)
 
     def create_radio_options(self):
         self.radio_options_layout = QtWidgets.QHBoxLayout()
