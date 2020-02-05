@@ -29,6 +29,7 @@ class MainWindow(QtWidgets.QWidget):
         self.column_colors = dict()
         self.directory = ""
         self.title = ""
+        self.custom_colors = list()
 
         layout = QtWidgets.QVBoxLayout()
         file_layout = QtWidgets.QHBoxLayout()
@@ -61,6 +62,8 @@ class MainWindow(QtWidgets.QWidget):
 
         self.create_color_table()
 
+        self.create_color_list()
+
         file_layout.addWidget(self.colorTable)
 
         self.create_label_title()
@@ -82,13 +85,13 @@ class MainWindow(QtWidgets.QWidget):
         layout.addLayout(self.title_label_layout)
         layout.addLayout(self.graph_type_layout)
         layout.addLayout(self.color_label_layout)
+        layout.addLayout(self.custom_colors_layout)
         layout.addLayout(directory_layout)
 
         layout.addWidget(self.processFilesButton)
         self.setLayout(layout)
 
     def create_graph_type_combo(self):
-
         self.graph_type_layout = QtWidgets.QHBoxLayout()
         self.graph_type_combo = QtWidgets.QComboBox()
         self.graph_type_combo.addItems(["Torta", "Barras", "Histograma"])
@@ -102,6 +105,40 @@ class MainWindow(QtWidgets.QWidget):
         self.color_label_layout.addWidget(QtWidgets.QLabel("Color de texto"))
         self.label_color_field = QtWidgets.QLineEdit()
         self.color_label_layout.addWidget(self.label_color_field)
+
+    def create_color_list(self):
+        self.custom_colors_layout = QtWidgets.QHBoxLayout()
+        self.custom_colors_layout.addWidget(QtWidgets.QLabel("Colores de columnas"))
+        self.custom_colors_field = QtWidgets.QLineEdit()
+        self.custom_colors_layout.addWidget(self.custom_colors_field)
+        self.apply_colors_btn = QtWidgets.QPushButton(parent=self)
+        self.apply_colors_btn.setText("Aplicar colores")
+        self.apply_colors_btn.clicked.connect(self.apply_custom_colors)
+        self.custom_colors_layout.addWidget(self.apply_colors_btn)
+    
+    def apply_custom_colors(self):
+        if len(self.custom_colors_field.text()) > 1:
+            self.custom_colors = self.custom_colors_field.text().split(',')
+            i = 0
+            self.column_colors.clear()
+
+            for file in self.files:
+                csv_file = csv.DictReader(open(file[1]))
+                for field in csv_file.fieldnames:
+                    if not self.column_colors.__contains__(field):
+                        self.column_colors[field] = self.custom_colors[i]
+                        i+=1
+                        if i == len(self.custom_colors):
+                            i=0
+                i=0
+            i = 0
+            for key in self.column_colors.keys():
+                self.colorTable.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
+                self.colorTable.setItem(
+                    i, 1, QtWidgets.QTableWidgetItem(self.column_colors[key]))
+                self.colorTable.item(i, 0).setBackground(
+                    QtGui.QColor(self.column_colors[key]))
+                i += 1
 
     def create_label_title(self):
         self.title_label_layout = QtWidgets.QHBoxLayout()
@@ -161,9 +198,9 @@ class MainWindow(QtWidgets.QWidget):
                                             autopct='%1.0f%%', pctdistance=1.2, radius=0.4)
 
         c = [ mpatches.Circle((0.5, 0.5), radius = 0.25, facecolor=colors[i], edgecolor="none" ) for i in range(len(texts))]
+        labels = ["\n".join(wrap(label, 40)) for label in labels]
         plt.legend(c,labels,handler_map={mpatches.Circle: HandlerEllipse()}, loc='center left', bbox_to_anchor=(1.1,0.5), frameon=False, prop=PROP)
         title = file.replace('.csv', '').replace('_groupped', '').replace('_', ' ').upper()
-        
         fig1.suptitle("\n".join(wrap(title, 60)), fontproperties=PROP)
         
         #for text in texts:
