@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt  # Pie chart
-from matplotlib import font_manager as fm
+import matplotlib.font_manager as fm
 import matplotlib as mpl
 import csv, random, os
 import pandas as pd
@@ -9,7 +9,7 @@ import matplotlib.patches as mpatches
 from matplotlib.legend_handler import HandlerPatch
 from textwrap import wrap
 from constants import MATERIAL_COLORS, get_colors
-print(fm._fmcache)
+
 FPATH = os.path.join('.', "fonts/futura/Futura Book font.ttf")
 PROP = fm.FontProperties(fname=FPATH)
 
