@@ -1,27 +1,41 @@
 import matplotlib.pyplot as plt  # Pie chart
 import matplotlib.font_manager as fm
-import matplotlib as mpl
-import csv, random, os
+import csv
+import random
+import os
 import pandas as pd
 import numpy as np
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 import matplotlib.patches as mpatches
 from matplotlib.legend_handler import HandlerPatch
 from textwrap import wrap
-from constants import MATERIAL_COLORS, get_colors
+from constants import MATERIAL_COLORS
 
-FPATH = os.path.join('.', "fonts/futura/Futura Book font.ttf")
+FPATH = os.path.join(".", "fonts/futura/Futura Book font.ttf")
 PROP = fm.FontProperties(fname=FPATH)
 
+
 class HandlerEllipse(HandlerPatch):
-    def create_artists(self, legend, orig_handle,
-                       xdescent, ydescent, width, height, fontsize, trans):
+    def create_artists(
+        self,
+        legend,
+        orig_handle,
+        xdescent,
+        ydescent,
+        width,
+        height,
+        fontsize,
+        trans,
+    ):
         center = 0.5 * width - 0.5 * xdescent, 0.5 * height - 0.5 * ydescent
-        p = mpatches.Ellipse(xy=center, width=height + xdescent,
-                             height=height + ydescent)
+        p = mpatches.Ellipse(
+            xy=center, width=height + xdescent, height=height + ydescent
+        )
         self.update_prop(p, orig_handle, legend)
         p.set_transform(trans)
         return [p]
+
+
 class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -55,7 +69,8 @@ class MainWindow(QtWidgets.QWidget):
         self.chooseDirectory.clicked.connect(self.select_directory)
 
         self.directory_label = QtWidgets.QLabel(
-            "No se seleccionó ningún directorio")
+            "No se seleccionó ningún directorio"
+        )
         directory_layout.addWidget(self.chooseDirectory)
 
         directory_layout.addWidget(self.directory_label)
@@ -108,17 +123,19 @@ class MainWindow(QtWidgets.QWidget):
 
     def create_color_list(self):
         self.custom_colors_layout = QtWidgets.QHBoxLayout()
-        self.custom_colors_layout.addWidget(QtWidgets.QLabel("Colores de columnas"))
+        self.custom_colors_layout.addWidget(
+            QtWidgets.QLabel("Colores de columnas")
+        )
         self.custom_colors_field = QtWidgets.QLineEdit()
         self.custom_colors_layout.addWidget(self.custom_colors_field)
         self.apply_colors_btn = QtWidgets.QPushButton(parent=self)
         self.apply_colors_btn.setText("Aplicar colores")
         self.apply_colors_btn.clicked.connect(self.apply_custom_colors)
         self.custom_colors_layout.addWidget(self.apply_colors_btn)
-    
+
     def apply_custom_colors(self):
         if len(self.custom_colors_field.text()) > 1:
-            self.custom_colors = self.custom_colors_field.text().split(',')
+            self.custom_colors = self.custom_colors_field.text().split(",")
             i = 0
             self.column_colors.clear()
 
@@ -127,17 +144,19 @@ class MainWindow(QtWidgets.QWidget):
                 for field in csv_file.fieldnames:
                     if not self.column_colors.__contains__(field):
                         self.column_colors[field] = self.custom_colors[i]
-                        i+=1
+                        i += 1
                         if i == len(self.custom_colors):
-                            i=0
-                i=0
+                            i = 0
+                i = 0
             i = 0
             for key in self.column_colors.keys():
                 self.colorTable.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
                 self.colorTable.setItem(
-                    i, 1, QtWidgets.QTableWidgetItem(self.column_colors[key]))
+                    i, 1, QtWidgets.QTableWidgetItem(self.column_colors[key])
+                )
                 self.colorTable.item(i, 0).setBackground(
-                    QtGui.QColor(self.column_colors[key]))
+                    QtGui.QColor(self.column_colors[key])
+                )
                 i += 1
 
     def create_label_title(self):
@@ -153,7 +172,8 @@ class MainWindow(QtWidgets.QWidget):
         self.file_per_row_btn.setChecked(True)
 
         self.group_rows_btn = QtWidgets.QRadioButton(
-            "Agrupar lineas en una imagen")
+            "Agrupar lineas en una imagen"
+        )
 
         self.radio_options_layout.addWidget(self.file_per_row_btn)
         self.radio_options_layout.addWidget(self.group_rows_btn)
@@ -162,7 +182,7 @@ class MainWindow(QtWidgets.QWidget):
         self.colorTable = QtWidgets.QTableWidget(self)
         self.colorTable.setColumnCount(2)
         self.colorTable.setRowCount(0)
-        self.colorTable.setHorizontalHeaderLabels(['Columna', 'Color (Hexa)'])
+        self.colorTable.setHorizontalHeaderLabels(["Columna", "Color (Hexa)"])
         self.colorTable.itemChanged.connect(self.item_changed)
         color_header = self.colorTable.horizontalHeader()
         color_header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
@@ -185,48 +205,84 @@ class MainWindow(QtWidgets.QWidget):
     def create_table_widget(self):
         self.tableView = QtWidgets.QTableWidget(self)
         self.tableView.setColumnCount(1)
-        self.tableView.setHorizontalHeaderLabels(['Archivo'])
+        self.tableView.setHorizontalHeaderLabels(["Archivo"])
         self.tableView.setSelectionBehavior(
-            QtWidgets.QAbstractItemView.SelectRows)
+            QtWidgets.QAbstractItemView.SelectRows
+        )
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
     def create_pie_chart(self, sizes, colors, file, labels):
-        
-        fig1, ax1 = plt.subplots()
-        patches, texts, autotexts = ax1.pie(sizes, colors=colors, labels=None,
-                                            autopct='%1.0f%%', pctdistance=1.2, radius=0.4)
 
-        c = [ mpatches.Circle((0.5, 0.5), radius = 0.25, facecolor=colors[i], edgecolor="none" ) for i in range(len(texts))]
+        fig1, ax1 = plt.subplots()
+        patches, texts, autotexts = ax1.pie(
+            sizes,
+            colors=colors,
+            labels=None,
+            autopct="%1.0f%%",
+            pctdistance=1.2,
+            radius=0.4,
+        )
+
+        c = [
+            mpatches.Circle(
+                (0.5, 0.5), radius=0.25, facecolor=colors[i], edgecolor="none"
+            )
+            for i in range(len(texts))
+        ]
         labels = ["\n".join(wrap(label, 40)) for label in labels]
-        plt.legend(c,labels,handler_map={mpatches.Circle: HandlerEllipse()}, loc='center left', bbox_to_anchor=(1.1,0.5), frameon=False, prop=PROP)
-        title = file.replace('.csv', '').replace('_groupped', '').replace('_', ' ').upper()
+        plt.legend(
+            c,
+            labels,
+            handler_map={mpatches.Circle: HandlerEllipse()},
+            loc="center left",
+            bbox_to_anchor=(1.1, 0.5),
+            frameon=False,
+            prop=PROP,
+        )
+        title = (
+            file.replace(".csv", "")
+            .replace("_groupped", "")
+            .replace("_", " ")
+            .upper()
+        )
         fig1.suptitle("\n".join(wrap(title, 60)), fontproperties=PROP)
-        
-        #for text in texts:
-         #   text.set_color('white')
-         #   text.set_font_properties(PROP)
+
+        # for text in texts:
+        #   text.set_color('white')
+        #   text.set_font_properties(PROP)
         for autotext in autotexts:
-            autotext.set_color('grey')
+            autotext.set_color("grey")
             autotext.set_font_properties(PROP)
 
-        ax1.axis('equal')
+        ax1.axis("equal")
         plt.tight_layout()
-        plt.savefig(self.directory+'/'+file.replace('.csv', '')+'_pie.eps')
+        plt.savefig(
+            self.directory + "/" + file.replace(".csv", "") + "_pie.eps"
+        )
 
     def create_bar_chart(self, sizes, colors, labels, file):
         print("Creating bar chart")
-        plt.legend(loc='center', borderpad=0.0, fontproperties=PROP)
+        plt.legend(loc="center", borderpad=0.0, fontproperties=PROP)
         fig, ax = plt.subplots()
         index = np.arange(len(labels))
         bar_width = 0.35
         opacity = 0.8
-        plt.bar(index, sizes, bar_width, alpha=opacity, color=colors, fontproperties=PROP)
-        plt.title(file.replace('.csv', '').upper())
+        plt.bar(
+            index,
+            sizes,
+            bar_width,
+            alpha=opacity,
+            color=colors,
+            fontproperties=PROP,
+        )
+        plt.title(file.replace(".csv", "").upper())
         plt.xticks(index, labels)
         plt.legend()
         plt.tight_layout()
-        plt.savefig(self.directory+'/'+file.replace('.csv', '')+'_bar.eps')
+        plt.savefig(
+            self.directory + "/" + file.replace(".csv", "") + "_bar.eps"
+        )
         print("Finished bar chart")
 
     def create_images(self):
@@ -234,8 +290,9 @@ class MainWindow(QtWidgets.QWidget):
             for file in self.files:
                 print(file)
                 open_file = csv.DictReader(open(file[1]))
-                custom_color = [self.column_colors[key]
-                                for key in open_file.fieldnames]
+                custom_color = [
+                    self.column_colors[key] for key in open_file.fieldnames
+                ]
                 print("fields")
                 print(open_file.fieldnames)
                 if self.file_per_row_btn.isChecked():
@@ -244,52 +301,61 @@ class MainWindow(QtWidgets.QWidget):
                         sizes = [v for k, v in row.items() if int(v) > 0]
                         if self.graph_type_combo.currentIndex() == 0:
                             self.create_pie_chart(
-                                sizes=sizes, 
-                                colors=custom_color, 
-                                labels=open_file.fieldnames, 
-                                file=file[0])
+                                sizes=sizes,
+                                colors=custom_color,
+                                labels=open_file.fieldnames,
+                                file=file[0],
+                            )
 
                         elif self.graph_type_combo.currentIndex() == 1:
                             self.create_bar_chart(
-                                sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0])
+                                sizes=sizes,
+                                colors=custom_color,
+                                labels=open_file.fieldnames,
+                                file=file[0],
+                            )
                         i += 1
                 else:
                     df = pd.read_csv(file[1])
                     sizes = [df[column].sum() for column in df.columns]
                     if self.graph_type_combo.currentIndex() == 0:
                         self.create_pie_chart(
-                            sizes=sizes, 
-                            colors=custom_color, 
-                            labels=open_file.fieldnames, 
-                            file=file[0]+'_groupped')
+                            sizes=sizes,
+                            colors=custom_color,
+                            labels=open_file.fieldnames,
+                            file=file[0] + "_groupped",
+                        )
 
                     elif self.graph_type_combo.currentIndex() == 1:
                         self.create_bar_chart(
-                            sizes=sizes, colors=custom_color, labels=open_file.fieldnames, file=file[0]+'_groupped')
+                            sizes=sizes,
+                            colors=custom_color,
+                            labels=open_file.fieldnames,
+                            file=file[0] + "_groupped",
+                        )
         else:
             self.showDialog()
 
     def item_changed(self, item):
         if item.column() > 0:
             hexa = item.text()
-            item_changed = False
             if len(hexa) == 0:
                 hexa = "#FFFFFF"
-                item_changed = True
             if len(hexa) > 0:
                 if not hexa.startswith("#"):
-                    hexa = "#"+hexa
-                    item_changed = True
+                    hexa = "#" + hexa
                 if len(hexa) < 7:
                     while len(hexa) < 7:
-                        hexa = hexa+'0'
-                        item_changed = True
+                        hexa = hexa + "0"
             self.colorTable.item(item.row(), 1).setBackground(
-                QtGui.QColor(hexa))
+                QtGui.QColor(hexa)
+            )
             self.colorTable.item(item.row(), 0).setBackground(
-                QtGui.QColor(hexa))
-            self.column_colors[self.colorTable.item(
-                item.row(), 0).text()] = hexa
+                QtGui.QColor(hexa)
+            )
+            self.column_colors[self.colorTable.item(item.row(), 0).text()] = (
+                hexa
+            )
 
     def showDialog(self):
         msgBox = QtWidgets.QMessageBox()
@@ -300,7 +366,7 @@ class MainWindow(QtWidgets.QWidget):
 
         returnValue = msgBox.exec()
         if returnValue == QtWidgets.QMessageBox.Ok:
-            print('OK clicked')
+            print("OK clicked")
 
     def select_new_file(self):
         dlg = QtWidgets.QFileDialog(self)
@@ -310,8 +376,9 @@ class MainWindow(QtWidgets.QWidget):
 
         if dlg.exec_():
             filenames = dlg.selectedFiles()
-            self.files.extend((name.split('/')[-1], name)
-                              for name in filenames)
+            self.files.extend(
+                (name.split("/")[-1], name) for name in filenames
+            )
             print(self.files)
             self.update_files()
             self.update_color_table()
@@ -339,9 +406,11 @@ class MainWindow(QtWidgets.QWidget):
         for key in self.column_colors.keys():
             self.colorTable.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
             self.colorTable.setItem(
-                i, 1, QtWidgets.QTableWidgetItem(self.column_colors[key]))
+                i, 1, QtWidgets.QTableWidgetItem(self.column_colors[key])
+            )
             self.colorTable.item(i, 0).setBackground(
-                QtGui.QColor(self.column_colors[key]))
+                QtGui.QColor(self.column_colors[key])
+            )
 
             i += 1
 
