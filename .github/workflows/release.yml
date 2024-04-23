@@ -3,7 +3,7 @@ name: Build Python application
 on:
   push:
     tags:
-      - "*"
+      - 'v*.*.*'
 
 jobs:
   build:
