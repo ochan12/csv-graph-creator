@@ -3,7 +3,7 @@ name: Build Python application
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'test*.*.*'
 
 jobs:
   build:
@@ -20,10 +20,10 @@ jobs:
           pip install -r requirements.txt
       - name: Build with pyinstaller
         run: |
-          pyinstaller -n "CSV-Graph-Creator" src/app.py
+          pyinstaller --onefile --windowed -n "CSV-Graph-Creator" src/app.py
       - name: Create Release
         uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: dist/CSV-Graph-Creator/CSV-Graph-Creator
-          body: "$GITHUB_REF_NAME"
+          body: "${{ github.ref_name }}"
             
