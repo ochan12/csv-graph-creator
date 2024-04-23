@@ -3,3 +3,5 @@
 *.eps
 *.csv
 __pycache__
+build
+dist

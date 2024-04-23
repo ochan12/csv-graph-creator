@@ -1,0 +1,29 @@
+name: Build Python application
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11.8
+        uses: actions/setup-python@v5 
+        with:
+          python-version: 3.11.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build with pyinstaller
+        run: |
+          pyinstaller -n "CSV-Graph-Creator" src/app.py
+      - name: Create Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: dist/CSV-Graph-Creator/CSV-Graph-Creator
+          body: "$GITHUB_REF_NAME"
+            
