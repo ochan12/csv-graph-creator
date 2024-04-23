@@ -3,7 +3,7 @@ name: Build Python application
 on:
   push:
     tags:
-      - 'test*.*.*'
+      - 'v*.*.*'
 
 jobs:
   build:
@@ -24,6 +24,6 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1.14.0
         with:
-          artifacts: dist/CSV-Graph-Creator/CSV-Graph-Creator
+          artifacts: dist/CSV-Graph-Creator
           body: "${{ github.ref_name }}"
             
